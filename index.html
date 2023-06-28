@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calc-U-Later</title>
+    <style>
+        .keypad {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 5px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            width: 220px
+        }
+        .key {
+            height: 50px;
+            width: 50px;
+            font-size: 24px;
+            /* text-align: center;
+            vertical-align: middle; */
+        }
+        .display {
+            display: flex;
+            justify-content: flex-end;
+            width: 220px;
+            height: 60px;
+            margin: 5px;
+            padding: 0;
+            font-size: 16px;
+            background-color: rgb(212, 230, 224);
+        }
+        .calculator {
+            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            /* justify-content: center; */
+            align-items: center;
+        }
+
+
+    </style>
+    <script>
+
+    </script>
+</head>
+<body>
+    <div class="header">
+
+    </div>
+    <div class="calculator">
+        <div class="display">
+
+        </div>
+
+        <div class="keypad">
+            <div class="row">
+                <button class="key_op _clear">C</button>
+                <button class="key_op _bracket">()</button>
+                <button class="key_op _percent">%</button>
+                <button class="key_op _divide">/</button>
+            </div>
+            <div class="row">
+                <button class="key _7">7</button>
+                <button class="key _8">8</button>
+                <button class="key _9">9</button>
+                <button class="key_op _x">x</button>
+            </div>
+            <div class="row">
+                <button class="key _4">4</button>
+                <button class="key _5">5</button>
+                <button class="key _6">6</button>
+                <button class="key_op _minus">-</button>
+            </div>
+            <div class="row">
+                <button class="key _1">1</button>
+                <button class="key _2">2</button>
+                <button class="key _3">3</button>
+                <button class="key_op _plus">+</button>
+            </div>
+            <div class="row">
+                <button class="key_op _plusminus">+/-</button>
+                <button class="key _0">0</button>
+                <button class="key _point">.</button>
+                <button class="key_op _equals">=</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+    </div>
+</body>
+</html>
