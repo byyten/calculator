@@ -17,20 +17,20 @@
             gap: 5px;
             width: 220px
         }
-        .key {
+        .key, .key_op {
             height: 50px;
             width: 50px;
             font-size: 24px;
             /* text-align: center;
             vertical-align: middle; */
         }
-        .display {
+        ._display {
             display: flex;
             justify-content: flex-end;
             width: 220px;
             height: 60px;
             margin: 5px;
-            padding: 0;
+            padding: 10px;
             font-size: 16px;
             background-color: rgb(212, 230, 224);
         }
@@ -45,6 +45,144 @@
 
     </style>
     <script>
+        let ui 
+
+        let operations = {
+            _symbols: {
+                _plus: ' + ',
+                _minus: ' - ',
+                _multiply: ' * ',
+                _divide: ' / ',
+                _equals: ' = ',
+                _point: '.',
+            },
+            _add: (a, b) => { return a + b },
+            _subtract: (a, b) => { return a - b },
+            _multiply: (a, b) => { return a * b },
+            _divide: (a, b) => {
+                if (b == 0) {
+                    alert('invalid input: division by 0 is an illegal operation')
+                    return
+                }
+                return Number((a / b).toFixed(3))
+            }
+        }
+        let getNumber = (evt) => {
+            ui._keypress = evt.target.classList[1].split('_')[1];
+            if (ui._keypress == 'point') { 
+                ui._keypress = '.';
+            }
+            ui._expression += ui._keypress;
+            console.log('press: '  + ui._keypress);
+            console.log('expression: ' + ui._expression);
+            ui._display.textContent = ui._expression
+            return (ui._keypress)
+        }
+        let getOper = (evt) => {
+            ui._keypress = operations._symbols[evt.target.classList[1]]
+            ui._expression += ui._keypress
+            console.log('press: ' + ui._keypress)
+            console.log('expression: ' + ui._expression)
+            ui._display.textContent = ui._expression
+            if (ui._keypress === operations._symbols._equals) {
+                res = runEvaluate()
+                ui._display.textContent += (' ' + res.toFixed(1))
+            }
+            return ui._keypress
+        }
+        let addToExpression = (char) => {
+            if (char.charCodeAt(0)) 
+            ui._expression += char.toString()
+        }
+        let runEvaluate = () => {
+            groups = ui._expression.split(/[\+\-]/g) 
+            posn = 0 // groups[0].length
+            group_ops = groups.map(grp => {
+                posn += grp.length + 1
+                return ui._expression[posn - 1]
+            }).filter(_f => _f !== undefined)
+            
+            total = 0 // groups[0]
+            groups.forEach((grp, idx) => {
+                result = group_evaluate(grp.trim().split(' ').map(_r=> isNaN(_r) ? _r : Number(_r)))
+                if (idx = 0) {
+                    total = result
+                } else { 
+                    if (group_ops[idx -1] == '+') {
+                        total += result
+                    } else {
+                        total -= result
+                    }
+                }
+            })
+            return total
+        }
+        let group_evaluate = (grp) => {
+            // grp --> [ 65.4, '*', 34.5, '*', 23.1 ]
+            grp_total = grp[0]
+            _g = grp.slice(1)
+            for (n = 0; n < _g.length; n+=2) {
+                if (_g[n] == '*') {
+                    grp_total *= _g[n +1]
+                } else if (_g[0] == '/') {
+                    grp_total /= _g[1]
+                } else if (_g[0] == '%') {
+                    grp_total = grp_total % _g[1]
+                } 
+            }
+            return grp_total
+        }
+
+        // runEvaluate(ui._expression)
+
+        fake_evt_click = (_k) => {
+            return { target: _k }
+        } 
+
+        let uiface = () => {
+            let calc = document.querySelector('.calculator');
+            ui = {
+
+                calc: calc,
+                _display: calc.querySelector('div._display'),
+                _9: calc.querySelector('button._9'),
+                _8: calc.querySelector('button._8'),
+                _7: calc.querySelector('button._7'),
+                _6: calc.querySelector('button._6'),
+                _5: calc.querySelector('button._5'),
+                _4: calc.querySelector('button._4'),
+                _3: calc.querySelector('button._3'),
+                _2: calc.querySelector('button._2'),
+                _1: calc.querySelector('button._1'),
+                _0: calc.querySelector('button._0'),
+                _plus: calc.querySelector('button._plus'),
+                _minus: calc.querySelector('button._minus'),
+                _multiply: calc.querySelector('button._multiply'),
+                _divide: calc.querySelector('button._divide'),
+                _equals: calc.querySelector('button._equals'),
+                _point: calc.querySelector('button._point'),
+                _backspace: calc.querySelector('button._backspace'),
+                _clear: calc.querySelector('button._clear'),
+                _keys: calc.querySelectorAll('.key'),
+                _key_ops: calc.querySelectorAll('.key_op'),
+                _keypress: '',
+                _expression: '',
+            }
+            ui._keys.forEach(_k => {
+                _k.addEventListener('click', evt => getNumber(evt))
+            })
+            ui._key_ops.forEach(_k => {
+                _k.addEventListener('click', evt => getOper(evt))
+            })
+
+            return ui
+        }
+
+        window.onload = uiface
+
+        // keys_ops = ui.calc.querySelectorAll('.key_op')
+        // keys = ui.calc.querySelectorAll('.key')
+
 
     </script>
 </head>
@@ -53,22 +191,22 @@
 
     </div>
     <div class="calculator">
-        <div class="display">
+        <div class="_display">
 
         </div>
 
         <div class="keypad">
             <div class="row">
                 <button class="key_op _clear">C</button>
-                <button class="key_op _bracket">()</button>
-                <button class="key_op _percent">%</button>
-                <button class="key_op _divide">/</button>
+                <button class="key_op _backspace">&#x232B;</button>
+                <button class="key_op _placeholder"></button>
+                <button class="key_op _divide">&divide;</button>
             </div>
             <div class="row">
                 <button class="key _7">7</button>
                 <button class="key _8">8</button>
                 <button class="key _9">9</button>
-                <button class="key_op _x">x</button>
+                <button class="key_op _multiply">x</button>
             </div>
             <div class="row">
                 <button class="key _4">4</button>
@@ -83,7 +221,7 @@
                 <button class="key_op _plus">+</button>
             </div>
             <div class="row">
-                <button class="key_op _plusminus">+/-</button>
+                <button class="key_op _plusminus">&#x00B1;</button>
                 <button class="key _0">0</button>
                 <button class="key _point">.</button>
                 <button class="key_op _equals">=</button>
