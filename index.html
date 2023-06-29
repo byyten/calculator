@@ -55,6 +55,8 @@
                 _divide: ' / ',
                 _equals: ' = ',
                 _point: '.',
+                _backkey: '<-',
+                _plusminus: '-', 
             },
             _add: (a, b) => { return a + b },
             _subtract: (a, b) => { return a - b },
@@ -80,32 +82,49 @@
         }
         let getOper = (evt) => {
             ui._keypress = operations._symbols[evt.target.classList[1]]
-            ui._expression += ui._keypress
-            console.log('press: ' + ui._keypress)
+            if (ui._keypress !== '<-' && ui._keypress !== ' = ') {
+                ui._expression += ui._keypress
+                console.log('press: ' + ui._keypress)
+            } 
             console.log('expression: ' + ui._expression)
             ui._display.textContent = ui._expression
             if (ui._keypress === operations._symbols._equals) {
-                res = runEvaluate()
-                ui._display.textContent += (' ' + res.toFixed(1))
+                res = runEvaluate() // * -1
+                ui._display.textContent += (' = ' + res.toFixed(1))
             }
             return ui._keypress
         }
-        let addToExpression = (char) => {
-            if (char.charCodeAt(0)) 
-            ui._expression += char.toString()
+        scrub = () => {
+            ui._display.textContent = ''
+            ui._expression = ''
         }
+        backkey = () => {
+            n = ui._expression.length
+            if (ui._expression.at(-1) == ' ') {
+                ui._expression = ui._expression.substring(0, n - 3)
+            } else {
+                ui._expression = ui._expression.substring(0, n - 1)
+            }
+            ui._display.textContent = ui._expression
+        }
+
+        // let addToExpression = (char) => {
+        //     if (char.charCodeAt(0)) 
+        //     ui._expression += char.toString()
+        // }
         let runEvaluate = () => {
-            groups = ui._expression.split(/[\+\-]/g) 
+            // groups = ui._expression.split(/['\ + '|'\ - ']/g) 
+            groups = ui._expression.split(/[\+|\-]/g)
             posn = 0 // groups[0].length
             group_ops = groups.map(grp => {
                 posn += grp.length + 1
                 return ui._expression[posn - 1]
-            }).filter(_f => _f !== undefined)
+            }).filter(_f => _f !== undefined && _f !== ' ')
             
             total = 0 // groups[0]
             groups.forEach((grp, idx) => {
                 result = group_evaluate(grp.trim().split(' ').map(_r=> isNaN(_r) ? _r : Number(_r)))
-                if (idx = 0) {
+                if (idx == 0) {
                     total = result
                 } else { 
                     if (group_ops[idx -1] == '+') {
@@ -113,6 +132,10 @@
                     } else {
                         total -= result
                     }
+                    
+                    // if (group_ops[idx -1] == '-') {
+                    //     total -= result
+                    // }
                 }
             })
             return total
@@ -161,8 +184,8 @@
                 _divide: calc.querySelector('button._divide'),
                 _equals: calc.querySelector('button._equals'),
                 _point: calc.querySelector('button._point'),
-                _backspace: calc.querySelector('button._backspace'),
-                _clear: calc.querySelector('button._clear'),
+                _backkey: calc.querySelector('button._backkey'),
+                _scrub: calc.querySelector('button._clear'),
                 _keys: calc.querySelectorAll('.key'),
                 _key_ops: calc.querySelectorAll('.key_op'),
                 _keypress: '',
@@ -174,6 +197,8 @@
             ui._key_ops.forEach(_k => {
                 _k.addEventListener('click', evt => getOper(evt))
             })
+            ui._scrub.addEventListener('click', scrub)
+            ui._backkey.addEventListener('click', backkey)
 
             return ui
         }
@@ -198,7 +223,7 @@
         <div class="keypad">
             <div class="row">
                 <button class="key_op _clear">C</button>
-                <button class="key_op _backspace">&#x232B;</button>
+                <button class="key_op _backkey">&#x232B;</button>
                 <button class="key_op _placeholder"></button>
                 <button class="key_op _divide">&divide;</button>
             </div>
