@@ -5,6 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calc-U-Later</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            font-family: Roboto, Verdana, Geneva, Tahoma, sans-serif; padding: 0; margin: 0
+        }
+        .aside {
+            margin-top: 50px;
+            display: flex; 
+            justify-content: center;
+        }
+        .brief {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 50%; 
+            font-size: 0.8em;
+        }
+        .footer { 
+            font-size: 0.65em;
+            display: flex; justify-content: center; height: 50px; 
+            align-items: center;
+            background-color: darkslategrey; color: aliceblue;
+        }
+        .brief.header {
+            display: flex; 
+            justify-content: flex-start;
+            /* text-align: left; */
+            font-size: 1.2em;
+            font-weight: 700;
+            
+        }
+        .brief.subheader {
+            font-size: 0.8em; 
+            font-style: italic;
+        }
+        .content {
+            display: flex; 
+            flex: 1 1 0; 
+            flex-direction: column; 
+            
+        }
         .keypad {
             display: flex;
             flex-direction: column;
@@ -18,15 +58,27 @@
             width: 220px
         }
         .key, .key_op {
+            border: 1px solid grey;
+            border-radius: 3px;
             height: 50px;
             width: 50px;
             font-size: 24px;
             /* text-align: center;
             vertical-align: middle; */
         }
+        /* .key:hover .key_op:hover {
+            background-color: calc();
+        } */
+        .key_op {
+            background-color: rgb(143, 168, 214);
+
+
+        }
         ._display {
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column;
+            /* justify-content: flex-end; */
+
             width: 220px;
             height: 60px;
             margin: 5px;
@@ -34,10 +86,21 @@
             font-size: 16px;
             background-color: rgb(212, 230, 224);
         }
+        ._display_expression {
+            display: flex;
+            justify-content: flex-end;
+
+        }
+        ._result {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 1.2em;
+        }
         .calculator {
             margin-top: 50px;
             display: flex;
             flex-direction: column;
+            flex: 1 1 0;
             /* justify-content: center; */
             align-items: center;
         }
@@ -48,6 +111,27 @@
         let ui 
 
         let operations = {
+            _ascii : {
+                _modulo: { asc: 37, sym: '+' },
+                _muliply: { asc: 42, sym: '*' },
+                _plus: { asc: 43, sym: '+' },
+                _minus: { asc: 45, sym: '-' },
+                _divide: { asc: 47, sym: '/' },
+                _equals: { asc: 61, sym: '=' },
+                _point: { asc: 46, sym: '.' },
+                _0: 48,
+                _1: 49,
+                _2: 50,
+                _3: 51,
+                _4: 52,
+                _5: 53,
+                _6: 54,
+                _7: 55,
+                _8: 56,
+                _9: 57,
+                // _open_bracket: 40,
+                // _close_bracket: 41,
+            },
             _symbols: {
                 _plus: ' + ',
                 _minus: ' - ',
@@ -67,35 +151,52 @@
                     return
                 }
                 return Number((a / b).toFixed(3))
-            }
+            },
+            _modulo: (a, b) => { return a % b }
         }
         let getNumber = (evt) => {
+            // if (evt.target.classList[1].split('_')[1] == 'plusminus') {
+            //     ui._negate = !ui._negate
+                
+            // }
             ui._keypress = evt.target.classList[1].split('_')[1];
             if (ui._keypress == 'point') { 
                 ui._keypress = '.';
+            } else if (ui._keypress == 'plusminus') {
+                ui._keypress = '-'
             }
             ui._expression += ui._keypress;
-            console.log('press: '  + ui._keypress);
-            console.log('expression: ' + ui._expression);
-            ui._display.textContent = ui._expression
+            ui._variable += ui._keypress;
+            console.log('press: '  + ui._keypress + '   expression: ' + ui._expression);
+            ui._display_expression.textContent = ui._expression
             return (ui._keypress)
         }
+        let clear_result = () => { ui._result.textContent = '' }
         let getOper = (evt) => {
             ui._keypress = operations._symbols[evt.target.classList[1]]
+
             if (ui._keypress !== '<-' && ui._keypress !== ' = ') {
                 ui._expression += ui._keypress
                 console.log('press: ' + ui._keypress)
             } 
-            console.log('expression: ' + ui._expression)
-            ui._display.textContent = ui._expression
+            console.log('press: '  + ui._keypress + '   expression: ' + ui._expression);
+            ui._display_expression.textContent = ui._expression
             if (ui._keypress === operations._symbols._equals) {
                 res = runEvaluate() // * -1
-                ui._display.textContent += (' = ' + res.toFixed(1))
+                if ( isNaN(res)) {
+                    ui._result.textContent = 'invalid expression'
+                    setTimeout(clear_result, 2000)    
+                } else {
+                    ui._display_expression.textContent += (' = ')
+                    ui._result.textContent =  + res.toFixed(1)
+                }
             }
+            ui._variable = ''
             return ui._keypress
         }
         scrub = () => {
-            ui._display.textContent = ''
+            ui._display_expression.textContent = '';
+            ui._result.textContent = ''
             ui._expression = ''
         }
         backkey = () => {
@@ -105,16 +206,23 @@
             } else {
                 ui._expression = ui._expression.substring(0, n - 1)
             }
-            ui._display.textContent = ui._expression
+            ui._expression.textContent = ui._expression
         }
 
         // let addToExpression = (char) => {
         //     if (char.charCodeAt(0)) 
         //     ui._expression += char.toString()
         // }
+
+
+
         let runEvaluate = () => {
-            // groups = ui._expression.split(/['\ + '|'\ - ']/g) 
-            groups = ui._expression.split(/[\+|\-]/g)
+            // groups = ui._expression.split(/['\+ '|'\- ']/g).filter(_f => _f !=='') 
+            // groups = ui._expression.split(/[\+|\-]/g)
+            re = /\s\+\s|\s\-\s/g
+            groups = ui._expression.split(re)
+            // group_ops = ui._expression.match(re) 
+            
             posn = 0 // groups[0].length
             group_ops = groups.map(grp => {
                 posn += grp.length + 1
@@ -158,6 +266,9 @@
 
         // runEvaluate(ui._expression)
 
+        let disable = (element) => {
+            element.disabled = !element.disabled
+        }
         fake_evt_click = (_k) => {
             return { target: _k }
         } 
@@ -168,6 +279,8 @@
 
                 calc: calc,
                 _display: calc.querySelector('div._display'),
+                _display_expression: calc.querySelector('div._display_expression'),
+                _result: calc.querySelector('div._result'),
                 _9: calc.querySelector('button._9'),
                 _8: calc.querySelector('button._8'),
                 _7: calc.querySelector('button._7'),
@@ -184,12 +297,16 @@
                 _divide: calc.querySelector('button._divide'),
                 _equals: calc.querySelector('button._equals'),
                 _point: calc.querySelector('button._point'),
+                _plusminus: calc.querySelector('button._plusminus'),
+                
                 _backkey: calc.querySelector('button._backkey'),
                 _scrub: calc.querySelector('button._clear'),
                 _keys: calc.querySelectorAll('.key'),
                 _key_ops: calc.querySelectorAll('.key_op'),
                 _keypress: '',
                 _expression: '',
+                _variable: '',
+                _negate: false,
             }
             ui._keys.forEach(_k => {
                 _k.addEventListener('click', evt => getNumber(evt))
@@ -199,6 +316,26 @@
             })
             ui._scrub.addEventListener('click', scrub)
             ui._backkey.addEventListener('click', backkey)
+            document.onkeypress = function (evt) {
+                evt = evt || window.event;
+                
+                if (evt.key) {
+                    // console.log(evt.key)
+                    if (evt.keyCode >= 48 && evt.keyCode <= 57) {
+                        // numbers 0-9
+                        console.log('numbers ' + evt.key)
+                    } else if ([94, 37, 42, 43, 45, 47].includes(evt.keyCode)) {
+                        // includes [^, %, *, +, -, /] (expon, modulo, mult, add, sub, div)
+                        console.log('an operation '  + evt.key)
+                    } else if (evt.keyCode == 61) {  // equals, run eval
+                        console.log('equals ' + evt.key)
+                    } else if (evt.keyCode == 8) { // 
+                        console.log('backspace ')
+                    }
+                }
+                
+                
+            };
 
             return ui
         }
@@ -214,50 +351,91 @@
 <body>
     <div class="header">
 
+
     </div>
-    <div class="calculator">
-        <div class="_display">
 
+    <div class="content">
+        <div class="calculator">
+            <div class="_display">
+                <div class="_display_expression">
+    
+                </div>
+                <div class="_result">
+    
+                </div>
+            </div>
+    
+            <div class="keypad">
+                <div class="row">
+                    <button class="key_op _clear">C</button>
+                    <button class="key_op _backkey">&#x232B;</button>
+                    <button class="key_op _placeholder"></button>
+                    <button class="key_op _divide">&divide;</button>
+                </div>
+                <div class="row">
+                    <button class="key _7">7</button>
+                    <button class="key _8">8</button>
+                    <button class="key _9">9</button>
+                    <button class="key_op _multiply">x</button>
+                </div>
+                <div class="row">
+                    <button class="key _4">4</button>
+                    <button class="key _5">5</button>
+                    <button class="key _6">6</button>
+                    <button class="key_op _minus">-</button>
+                </div>
+                <div class="row">
+                    <button class="key _1">1</button>
+                    <button class="key _2">2</button>
+                    <button class="key _3">3</button>
+                    <button class="key_op _plus">+</button>
+                </div>
+                <div class="row">
+                    <button class="key _plusminus">&#x00B1;</button>
+                    <button class="key _0">0</button>
+                    <button class="key _point">.</button>
+                    <button class="key_op _equals">=</button>
+                </div>
+    
+            </div>
+    
         </div>
-
-        <div class="keypad">
-            <div class="row">
-                <button class="key_op _clear">C</button>
-                <button class="key_op _backkey">&#x232B;</button>
-                <button class="key_op _placeholder"></button>
-                <button class="key_op _divide">&divide;</button>
+    
+       <div class="aside">
+            <div class="brief">
+                <p class="header">
+                    The Internal Debate
+                </p>
+                <p class="subheader">
+                    (the infernal debate)
+                </p>
+                <div  class="debate">
+                    <p>
+                        the brief for this project suggested building a simple calculator that evaluated a pair of numbers 
+                        and display a result before continuing to evaluate any further inputs which seemed in my mind 
+                        to be both correct and mathematically incorrect because if the whole expression were to be evaluated 
+                        using mathematical precedence the result would often be different to the brief's suggested implementation
+                        and the brief's suggested implementation would at times be wrong (mathematically).
+                    </p>
+                    <p> 
+                        that creates a disonance in my mind and thus led me to abandon the suggestion 
+                        and evaluate the input expressions using operator precedence in a 
+                        more correct interpretation of the math</p>
+                    <p>
+                        this behaviour also gets me into trouble as an employee because I don't necessarily follow directions
+                        and then be accused of not following instructions, the project objectives, being obstructive, lazy, disobedient, ...
+                        so, just don't it ok! 
+                        never mind that the solution might be better for that effort
+                    </p>
+                </div>
             </div>
-            <div class="row">
-                <button class="key _7">7</button>
-                <button class="key _8">8</button>
-                <button class="key _9">9</button>
-                <button class="key_op _multiply">x</button>
-            </div>
-            <div class="row">
-                <button class="key _4">4</button>
-                <button class="key _5">5</button>
-                <button class="key _6">6</button>
-                <button class="key_op _minus">-</button>
-            </div>
-            <div class="row">
-                <button class="key _1">1</button>
-                <button class="key _2">2</button>
-                <button class="key _3">3</button>
-                <button class="key_op _plus">+</button>
-            </div>
-            <div class="row">
-                <button class="key_op _plusminus">&#x00B1;</button>
-                <button class="key _0">0</button>
-                <button class="key _point">.</button>
-                <button class="key_op _equals">=</button>
-            </div>
-
         </div>
-
+    
+        
     </div>
 
     <div class="footer">
-
+        The Odin Project / Foundations Course / Project: Calculator / byyten / 2023 
     </div>
 </body>
 </html>
