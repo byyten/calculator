@@ -182,13 +182,24 @@
             console.log('press: '  + ui._keypress + '   expression: ' + ui._expression);
             ui._display_expression.textContent = ui._expression
             if (ui._keypress === operations._symbols._equals) {
-                res = runEvaluate() // * -1
+                res = run_evaluation(ui._expression) 
+                res_chk = eval(res)
+
                 if ( isNaN(res)) {
                     ui._result.textContent = 'invalid expression'
                     setTimeout(clear_result, 2000)    
                 } else {
                     ui._display_expression.textContent += (' = ')
                     ui._result.textContent =  + res.toFixed(1)
+                    if (res !== res_chk) {
+                        console.log(['Err: ', res, res_chk, res - res_chk])
+                        ui._result.style.backgroundColor = '#dd0000'
+                        ui._result.style.color = '#ffffff'
+                    } else {
+                        ui._result.style.backgroundColor = 'rgb(212, 230, 224)'
+                        ui._result.style.color = '#000000'
+                    }
+
                 }
             }
             ui._variable = ''
@@ -214,41 +225,31 @@
         //     ui._expression += char.toString()
         // }
 
+        const run_evaluation = (expr) => {
 
+            let re = /\s\+\s|\s\-\s/g;
+            let groups = expr.split(re);
+            let group_ops = expr.match(re); 
+            if (group_ops == null) { group_ops = [] }
 
-        let runEvaluate = () => {
-            // groups = ui._expression.split(/['\+ '|'\- ']/g).filter(_f => _f !=='') 
-            // groups = ui._expression.split(/[\+|\-]/g)
-            re = /\s\+\s|\s\-\s/g
-            groups = ui._expression.split(re)
-            // group_ops = ui._expression.match(re) 
-            
-            posn = 0 // groups[0].length
-            group_ops = groups.map(grp => {
-                posn += grp.length + 1
-                return ui._expression[posn - 1]
-            }).filter(_f => _f !== undefined && _f !== ' ')
-            
-            total = 0 // groups[0]
-            groups.forEach((grp, idx) => {
-                result = group_evaluate(grp.trim().split(' ').map(_r=> isNaN(_r) ? _r : Number(_r)))
-                if (idx == 0) {
-                    total = result
-                } else { 
-                    if (group_ops[idx -1] == '+') {
-                        total += result
-                    } else {
-                        total -= result
-                    }
-                    
-                    // if (group_ops[idx -1] == '-') {
-                    //     total -= result
-                    // }
+            console.log([groups.length, group_ops.length])
+
+            total = group_evaluate(groups[0].split(' '))
+            console.log(total)
+
+            groups.slice(1).forEach((grp, idx) => {
+                val = group_evaluate(grp.split(' '))
+                console.log([group_ops[idx], val])
+                if (group_ops[idx] === ' + ') {
+                total += val
+                } else if (group_ops[idx] === ' - ' ) {
+                total -= val
                 }
             })
-            return total
-        }
-        let group_evaluate = (grp) => {
+            return total;
+            }
+
+        const group_evaluate = (grp) => {
             // grp --> [ 65.4, '*', 34.5, '*', 23.1 ]
             grp_total = grp[0]
             _g = grp.slice(1)
@@ -261,10 +262,10 @@
                     grp_total = grp_total % _g[1]
                 } 
             }
-            return grp_total
+            return Number(grp_total)
         }
 
-        // runEvaluate(ui._expression)
+
 
         let disable = (element) => {
             element.disabled = !element.disabled
