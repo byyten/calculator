@@ -5,426 +5,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>calculator</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    <script src="./index.js"></script>
+    <link rel="stylesheet" href="./styles.css">
 
-        body {
-            display: flex;
-            flex-direction: column;
-            font-family: Roboto, Verdana, Geneva, Tahoma, sans-serif;
-            padding: 0;
-            margin: 0;
-            height:100vh;
-        }
-
-        .aside {
-            margin-top: 50px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .brief {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 50%;
-            font-size: 0.8em;
-        }
-
-        .footer {
-            font-size: 0.65em;
-            display: flex;
-            justify-content: center;
-            height: 50px;
-            align-items: center;
-            background-color: darkslategrey;
-            color: aliceblue;
-        }
-
-        .brief .header {
-            display: flex;
-            justify-content: flex-start;
-            /* text-align: left; */
-            font-size: 1.2em;
-            font-weight: 700;
-
-        }
-
-        .brief .subheader {
-            font-size: 0.8em;
-            font-style: italic;
-        }
-
-        .content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex: 1 1 0;
-            height: 100%; 
-        }
-
-        .keypad {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 5px;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            gap: 5px;
-            width: 220px
-        }
-
-        .key,
-        .key_op {
-            border: 1px solid grey;
-            border-radius: 3px;
-            height: 50px;
-            width: 50px;
-            font-size: 24px;
-            /* text-align: center;
-            vertical-align: middle; */
-        }
-
-        /* .key:hover .key_op:hover {
-            background-color: calc();
-        } */
-        .key_op {
-            background-color: rgb(143, 168, 214);
-
-
-        }
-
-        ._display {
-            display: flex;
-            flex-direction: column;
-            /* justify-content: flex-end; */
-
-            width: 220px;
-            height: 60px;
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
-            background-color: rgb(212, 230, 224);
-        }
-
-        ._display_expression {
-            display: flex;
-            justify-content: flex-end;
-
-        }
-
-        ._result {
-            display: flex;
-            justify-content: flex-end;
-            font-size: 1.2em;
-        }
-
-        .calculator {
-            margin-top: 50px;
-            display: flex;
-            flex-direction: column;
-            flex: 1 1 0;
-            /* justify-content: center; */
-            align-items: center;
-        }
-    </style>
     <script>
-        let ui
-
-        let operations = {
-            _ascii: {
-                _modulo: { asc: 37, sym: '+' },
-                _muliply: { asc: 42, sym: '*' },
-                _plus: { asc: 43, sym: '+' },
-                _minus: { asc: 45, sym: '-' },
-                _divide: { asc: 47, sym: '/' },
-                _equals: { asc: 61, sym: '=' },
-                _point: { asc: 46, sym: '.' },
-                _0: 48,
-                _1: 49,
-                _2: 50,
-                _3: 51,
-                _4: 52,
-                _5: 53,
-                _6: 54,
-                _7: 55,
-                _8: 56,
-                _9: 57,
-                // _open_bracket: 40,
-                // _close_bracket: 41,
-            },
-            _symbols: {
-                _plus: ' + ',
-                _minus: ' - ',
-                _multiply: ' * ',
-                _divide: ' / ',
-                _equals: ' = ',
-                _point: '.',
-                _backkey: '<-',
-                _plusminus: '-',
-            },
-            _add: (a, b) => { return a + b },
-            _subtract: (a, b) => { return a - b },
-            _multiply: (a, b) => { return a * b },
-            _divide: (a, b) => {
-                if (b == 0) {
-                    alert('invalid input: division by 0 is an illegal operation')
-                    return
-                }
-                return Number((a / b).toFixed(3))
-            },
-            _modulo: (a, b) => { return a % b }
-        }
-        let getNumber = (evt) => {
-            // if (evt.target.classList[1].split('_')[1] == 'plusminus') {
-            //     ui._negate = !ui._negate
-
-            // }
-            ui._keypress = evt.target.classList[1].split('_')[1];
-            if (ui._keypress == 'point') {
-                ui._keypress = '.';
-            } else if (ui._keypress == 'plusminus') {
-                ui._keypress = '-'
-            }
-            ui._expression += ui._keypress;
-            ui._variable += ui._keypress;
-            console.log('press: ' + ui._keypress + '   expression: ' + ui._expression);
-            ui._display_expression.textContent = ui._expression
-            return (ui._keypress)
-        }
-        let clear_result = () => { ui._result.textContent = '' }
-        let getOper = (evt) => {
-            ui._keypress = operations._symbols[evt.target.classList[1]]
-
-            if (ui._keypress !== '<-' && ui._keypress !== ' = ') {
-                ui._expression += ui._keypress
-                console.log('press: ' + ui._keypress)
-            }
-            console.log('press: ' + ui._keypress + '   expression: ' + ui._expression);
-            ui._display_expression.textContent = ui._expression
-            if (ui._keypress === operations._symbols._equals) {
-                res = run_evaluation(ui._expression)
-                res_chk = eval(res)
-
-                if (isNaN(res)) {
-                    ui._result.textContent = 'invalid expression'
-                    setTimeout(clear_result, 2000)
-                } else {
-                    ui._display_expression.textContent += (' = ')
-                    ui._result.textContent = + res.toFixed(1)
-                    if (res !== res_chk) {
-                        console.log(['Err: ', res, res_chk, res - res_chk])
-                        ui._result.style.backgroundColor = '#dd0000'
-                        ui._result.style.color = '#ffffff'
-                    } else {
-                        ui._result.style.backgroundColor = 'rgb(212, 230, 224)'
-                        ui._result.style.color = '#000000'
-                    }
-
-                }
-            }
-            ui._variable = ''
-            return ui._keypress
-        }
-        scrub = () => {
-            ui._display_expression.textContent = '';
-            ui._result.textContent = ''
-            ui._expression = ''
-        }
-        backkey = () => {
-            n = ui._expression.length
-            if (ui._expression.at(-1) == ' ') {
-                ui._expression = ui._expression.substring(0, n - 3)
-            } else {
-                ui._expression = ui._expression.substring(0, n - 1)
-            }
-            ui._expression.textContent = ui._expression
-        }
-
-        // let addToExpression = (char) => {
-        //     if (char.charCodeAt(0)) 
-        //     ui._expression += char.toString()
-        // }
-
-        const run_evaluation = (expr) => {
-
-            let re = /\s\+\s|\s\-\s/g;
-            let groups = expr.split(re);
-            let group_ops = expr.match(re);
-            if (group_ops == null) { group_ops = [] }
-
-            console.log([groups.length, group_ops.length])
-
-            total = group_evaluate(groups[0].split(' '))
-            console.log(total)
-
-            groups.slice(1).forEach((grp, idx) => {
-                val = group_evaluate(grp.split(' '))
-                console.log([group_ops[idx], val])
-                if (group_ops[idx] === ' + ') {
-                    total += val
-                } else if (group_ops[idx] === ' - ') {
-                    total -= val
-                }
-            })
-            return total;
-        }
-
-        const group_evaluate = (grp) => {
-            // grp --> [ 65.4, '*', 34.5, '*', 23.1 ]
-            grp_total = grp[0]
-            _g = grp.slice(1)
-            for (n = 0; n < _g.length; n += 2) {
-                if (_g[n] == '*') {
-                    grp_total *= _g[n + 1]
-                } else if (_g[0] == '/') {
-                    grp_total /= _g[1]
-                } else if (_g[0] == '%') {
-                    grp_total = grp_total % _g[1]
-                }
-            }
-            return Number(grp_total)
-        }
-
-
-
-        let disable = (element) => {
-            element.disabled = !element.disabled
-        }
-        fake_evt_click = (_k) => {
-            return { target: _k }
-        }
-
-        let uiface = () => {
-            let calc = document.querySelector('.calculator');
-            ui = {
-
-                calc: calc,
-                _display: calc.querySelector('div._display'),
-                _display_expression: calc.querySelector('div._display_expression'),
-                _result: calc.querySelector('div._result'),
-                _9: calc.querySelector('button._9'),
-                _8: calc.querySelector('button._8'),
-                _7: calc.querySelector('button._7'),
-                _6: calc.querySelector('button._6'),
-                _5: calc.querySelector('button._5'),
-                _4: calc.querySelector('button._4'),
-                _3: calc.querySelector('button._3'),
-                _2: calc.querySelector('button._2'),
-                _1: calc.querySelector('button._1'),
-                _0: calc.querySelector('button._0'),
-                _plus: calc.querySelector('button._plus'),
-                _minus: calc.querySelector('button._minus'),
-                _multiply: calc.querySelector('button._multiply'),
-                _divide: calc.querySelector('button._divide'),
-                _equals: calc.querySelector('button._equals'),
-                _point: calc.querySelector('button._point'),
-                _plusminus: calc.querySelector('button._plusminus'),
-
-                _backkey: calc.querySelector('button._backkey'),
-                _scrub: calc.querySelector('button._clear'),
-                _keys: calc.querySelectorAll('.key'),
-                _key_ops: calc.querySelectorAll('.key_op'),
-                _keypress: '',
-                _expression: '',
-                _variable: '',
-                _negate: false,
-            }
-            ui._keys.forEach(_k => {
-                _k.addEventListener('click', evt => getNumber(evt))
-            })
-            ui._key_ops.forEach(_k => {
-                _k.addEventListener('click', evt => getOper(evt))
-            })
-            ui._scrub.addEventListener('click', scrub)
-            ui._backkey.addEventListener('click', backkey)
-            document.onkeypress = function (evt) {
-                evt = evt || window.event;
-
-                if (evt.key) {
-                    // console.log(evt.key)
-                    if (evt.keyCode >= 48 && evt.keyCode <= 57) {
-                        // numbers 0-9
-                        console.log('numbers ' + evt.key)
-                    } else if ([94, 37, 42, 43, 45, 47].includes(evt.keyCode)) {
-                        // includes [^, %, *, +, -, /] (expon, modulo, mult, add, sub, div)
-                        console.log('an operation ' + evt.key)
-                    } else if (evt.keyCode == 61) {  // equals, run eval
-                        console.log('equals ' + evt.key)
-                    } else if (evt.keyCode == 8) { // 
-                        console.log('backspace ')
-                    }
-                }
-
-
-            };
-
-            return ui
-        }
-
         window.onload = uiface
-
-        // keys_ops = ui.calc.querySelectorAll('.key_op')
-        // keys = ui.calc.querySelectorAll('.key')
-
-
     </script>
 </head>
-
 <body>
     <div class="header">
-
-
     </div>
-
     <div class="content">
         <div class="calculator">
             <div class="_display">
                 <div class="_display_expression">
-
                 </div>
                 <div class="_result">
-
                 </div>
             </div>
-
             <div class="keypad">
                 <div class="row">
-                    <button class="key_op _clear">C</button>
-                    <button class="key_op _backkey">&#x232B;</button>
-                    <button class="key_op _placeholder"></button>
-                    <button class="key_op _divide">&divide;</button>
+                    <button class="key_op _clear" title="ESC | DEL">C</button>
+                    <button class="key_op _backkey" title="Backspace <-">&#x232B;</button>
+                    <button class="key_op _placeholder" title="No assigned function"></button>
+                    <button class="key_op _divide" title="divide">&divide;</button>
                 </div>
                 <div class="row">
-                    <button class="key _7">7</button>
-                    <button class="key _8">8</button>
-                    <button class="key _9">9</button>
-                    <button class="key_op _multiply">x</button>
+                    <button class="key _7" title="seven">7</button>
+                    <button class="key _8" title="eight">8</button>
+                    <button class="key _9" title="nine">9</button>
+                    <button class="key_op _multiply" title="multiply">x</button>
                 </div>
                 <div class="row">
-                    <button class="key _4">4</button>
-                    <button class="key _5">5</button>
-                    <button class="key _6">6</button>
-                    <button class="key_op _minus">-</button>
+                    <button class="key _4" title="four">4</button>
+                    <button class="key _5" title="five">5</button>
+                    <button class="key _6" title="six">6</button>
+                    <button class="key_op _minus" title="subtract">-</button>
                 </div>
                 <div class="row">
-                    <button class="key _1">1</button>
-                    <button class="key _2">2</button>
-                    <button class="key _3">3</button>
-                    <button class="key_op _plus">+</button>
+                    <button class="key _1" title="one">1</button>
+                    <button class="key _2" title="two">2</button>
+                    <button class="key _3" title="three">3</button>
+                    <button class="key_op _plus" title="add">+</button>
                 </div>
                 <div class="row">
-                    <button class="key _plusminus">&#x00B1;</button>
-                    <button class="key _0">0</button>
-                    <button class="key _point">.</button>
-                    <button class="key_op _equals">=</button>
+                    <button class="key _plusminus" title="negate">&#x00B1;</button>
+                    <button class="key _0" title="zero">0</button>
+                    <button class="key _point" title="decimal point">.</button>
+                    <button class="key_op _equals" title="= | Enter">=</button>
                 </div>
-
             </div>
-
         </div>
 
         <div class="aside">
@@ -440,11 +70,13 @@
                         the brief for this project suggested building a simple calculator that evaluated a pair of
                         numbers and display a result before continuing to evaluate any further inputs which seemed 
                         in my mind to be both correct and mathematically incorrect because if the whole expression 
-                        were to be evaluated using mathematical precedence the result would often be different to 
-                        the brief's suggested implementation and hence mathematically incorrect on occasion
+                        were to be evaluated using mathematical precedence the result (from the suggested solution)
+                        would often be mathematically incorrect - not a good scenario for a calculator and the 
+                        planet's/universe's only precise and deterministic language (maybe programming languages 
+                        could be in there as well)
                     </p>
                     <p>
-                        that created a disonance in my mind and thus led me to abandon the brief in that respect
+                        this created a disonance in my mind and thus led me to abandon the brief in that respect
                         and evaluate the input expressions using operator precedence in a more correct interpretation 
                         of the math (the calculator will tell you if the answer it produces differs from what 
                         javascript 'eval()' produces) by highlighting the result in red however it is still lacking 
@@ -463,13 +95,9 @@
                 </div>
             </div>
         </div>
-
-
     </div>
-
     <div class="footer">
         The Odin Project / Foundations Course / Project: Calculator / byyten / 2023
     </div>
 </body>
-
 </html>
