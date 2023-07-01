@@ -1,31 +1,11 @@
         let ui
         let operations = {
-            // _ascii: {
-            //     _modulo: { asc: 37, sym: '+' },
-            //     _muliply: { asc: 42, sym: '*' },
-            //     _plus: { asc: 43, sym: '+' },
-            //     _minus: { asc: 45, sym: '-' },
-            //     _divide: { asc: 47, sym: '/' },
-            //     _equals: { asc: 61, sym: '=' },
-            //     _point: { asc: 46, sym: '.' },
-            //     _0: 48,
-            //     _1: 49,
-            //     _2: 50,
-            //     _3: 51,
-            //     _4: 52,
-            //     _5: 53,
-            //     _6: 54,
-            //     _7: 55,
-            //     _8: 56,
-            //     _9: 57,
-            //     // _open_bracket: 40,
-            //     // _close_bracket: 41,
-            // },
             _symbols: {
                 _plus: ' + ',
                 _minus: ' - ',
                 _multiply: ' * ',
                 _divide: ' / ',
+                _modulo: ' % ',
                 _equals: ' = ',
                 _point: '.',
                 _backkey: '<-',
@@ -46,7 +26,7 @@
         let getNumber = (evt) => {
             if ('key' in evt) {
                 ui._keypress = evt.key
-            } else   { // ('target' in evt && 'classList' in evt.target)
+            } else   { 
                 ui._keypress = evt.target.classList[1].split('_')[1];
                 if (ui._keypress == 'point') {
                     ui._keypress = '.';
@@ -55,32 +35,40 @@
                 }
             }  
             ui._expression += ui._keypress;
-            ui._variable += ui._keypress;
+            
             console.log('press: ' + ui._keypress + '   expression: ' + ui._expression);
             ui._display_expression.textContent = ui._expression
+            fns_enable()
+            plus_minus()
             return (ui._keypress)
         }
-        let clear_result = () => { ui._result.textContent = '' }
+        let clear_result = () => { 
+            ui._result.textContent = '' 
+            
+        }
         let getOper = (evt) => {
             if ('key' in evt) {
                 if (evt.keyCode == 13) {
                     ui._keypress = ' = '
+                } else if ( evt.keyCode == 45 && ui._math_fns.includes(ui._keypress.trim()) || evt.keyCode == 45 && ui._expression == '') { // effectively a plus/minus
+                    ui._keypress = ' ' + evt.key
                 } else {
                     ui._keypress = ' ' + evt.key + ' '
                 }
-
-            } else {
+            } else { // it's button
                 ui._keypress = operations._symbols[evt.target.classList[1]]
             } 
+            fns_enable()
+ 
             if (ui._keypress !== '<-' && ui._keypress !== ' = ') {
                 ui._expression += ui._keypress
                 console.log('press: ' + ui._keypress)
             }
             console.log('press: ' + ui._keypress + '   expression: ' + ui._expression);
             ui._display_expression.textContent = ui._expression
-            if (ui._keypress === operations._symbols._equals) {
+            if (ui._keypress === operations._symbols._equals) { // evaluate the expression
                 let res = run_evaluation(ui._expression)
-                let res_chk = eval(res)
+                let res_chk = eval(res) // and get a reference checksum
 
                 if (isNaN(res)) {
                     ui._result.textContent = 'invalid expression'
@@ -93,18 +81,26 @@
                         ui._result.style.backgroundColor = '#dd0000'
                         ui._result.style.color = '#ffffff'
                     } else {
+                        console.log(['checksums OK: ', res, res_chk, res - res_chk])
                         ui._result.style.backgroundColor = 'rgb(212, 230, 224)'
                         ui._result.style.color = '#000000'
                     }
+                    ui._key_fns.forEach(fn => disable(fn, true) )
+                    ui._keys.forEach(ky => disable(ky, true) )
+                    ui._keypress = ''
+                    
                 }
             }
-            ui._variable = ''
-            return ui._keypress
+            plus_minus()
+             return ui._keypress
         }
         const scrub = () => {
             ui._display_expression.textContent = '';
             ui._result.textContent = ''
             ui._expression = ''
+            ui._keypress = ''
+            plus_minus()
+            fns_enable()
         }
         const backkey = () => {
             let n = ui._expression.length
@@ -119,9 +115,9 @@
 
 
         const run_evaluation = (expr) => {
-
+            // expr = expr.replaceAll(' + - ',' + -').replaceAll(' - - ',' - -')
             let re = /\s\+\s|\s-\s/g;
-            let groups = expr.split(re);
+            let groups = expr.trim().split(re);
             let group_ops = expr.match(re);
             if (group_ops == null) { group_ops = [] }
 
@@ -158,11 +154,35 @@
             return Number(grp_total)
         }
 
+        let fns_enable = () => {
+            if (ui._expression == '') { // blank expression
+                ui._key_fns.forEach(fn => disable(fn, false))
+                ui._keys.forEach(fn => disable(fn, false))
+            } else if (ui._math_fns.includes(ui._keypress.trim()) ) {
+                // last input is an operator so disable key_fns
+                ui._key_fns.forEach(fn => disable(fn, true))
+                disable(ui._plusminus, true) // plus_minus()
+            } else  {
+                // last input is *NOT* an operator --> a number so enable key fns 
+                ui._key_fns.forEach(fn => disable(fn, false))
+            }
+            
+        }
 
+        let disable = (elem, true_false) => {
+            elem.disabled = true_false
+        }
 
-        // let disable = (element) => {
-        //     element.disabled = !element.disabled
-        // }
+        let plus_minus = () => {
+            if (  ui._expression.at(-1) !== ' ' ) { // a number preceeds so +/- should be disabled
+                disable(ui._plusminus, true)
+              } else if (ui._expression == '') {
+                disable(ui._plusminus, false)
+              } else {
+                disable(ui._plusminus, false)
+              }  
+              
+        }
         // let fake_evt_click = (_k) => {
         //     return { target: _k }
         // }
@@ -188,6 +208,7 @@
                 _minus: calc.querySelector('button._minus'),
                 _multiply: calc.querySelector('button._multiply'),
                 _divide: calc.querySelector('button._divide'),
+                _modulo: calc.querySelector('button._modulo'),
                 _equals: calc.querySelector('button._equals'),
                 _point: calc.querySelector('button._point'),
                 _plusminus: calc.querySelector('button._plusminus'),
@@ -195,9 +216,11 @@
                 _backkey: calc.querySelector('button._backkey'),
                 _scrub: calc.querySelector('button._clear'),
                 _keys: calc.querySelectorAll('.key'),
+                _key_fns: calc.querySelectorAll('.key_fn'),
                 _key_ops: calc.querySelectorAll('.key_op'),
                 _keypress: '',
                 _expression: '',
+                _math_fns: ['+', '-', '*', '/', '%'],
             }
             ui._keys.forEach(_k => {
                 _k.addEventListener('click', evt => getNumber(evt))
@@ -205,10 +228,14 @@
             ui._key_ops.forEach(_k => {
                 _k.addEventListener('click', evt => getOper(evt))
             })
+            ui._key_fns.forEach(_k => {
+                _k.addEventListener('click', evt => getOper(evt))
+            })
             ui._scrub.addEventListener('click', scrub)
             ui._backkey.addEventListener('click', backkey)
             document.onkeypress = function (evt) {
                 evt = evt || window.event;
+                evt.preventDefault()
                 if (evt.key) {
                     console.log(evt.key + " " + evt.keyCode)
                     if (evt.keyCode >= 48 && evt.keyCode <= 57) {
@@ -220,12 +247,11 @@
                         console.log('an operation ' + evt.key)
                         getOper(evt)
                     } else if (evt.keyCode == 61 || evt.keyCode == 13) {  // equals, run eval
-                        console.log('equals ' + evt.key)
+                        console.log('equals ' + evt.key)  
                         getOper(evt)
                     } 
                 }
-
-
+                // fns_enable()
             };
             document.onkeydown = function (evt) {
                 evt = evt || window.event;
@@ -245,10 +271,33 @@
                 // Escape 27 
                 // Enter 13 
             } 
+            
             return ui
         }
 
  
         // keys_ops = ui.calc.querySelectorAll('.key_op')
         // keys = ui.calc.querySelectorAll('.key')
-
+/*
+            // _ascii: {
+            //     _modulo: { asc: 37, sym: '+' },
+            //     _muliply: { asc: 42, sym: '*' },
+            //     _plus: { asc: 43, sym: '+' },
+            //     _minus: { asc: 45, sym: '-' },
+            //     _divide: { asc: 47, sym: '/' },
+            //     _equals: { asc: 61, sym: '=' },
+            //     _point: { asc: 46, sym: '.' },
+            //     _0: 48,
+            //     _1: 49,
+            //     _2: 50,
+            //     _3: 51,
+            //     _4: 52,
+            //     _5: 53,
+            //     _6: 54,
+            //     _7: 55,
+            //     _8: 56,
+            //     _9: 57,
+            //     // _open_bracket: 40,
+            //     // _close_bracket: 41,
+            // },
+*/

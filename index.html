@@ -26,27 +26,27 @@
             <div class="keypad">
                 <div class="row">
                     <button class="key_op _clear" title="ESC | DEL">C</button>
-                    <button class="key_op _backkey" title="Backspace <-">&#x232B;</button>
-                    <button class="key_op _placeholder" title="No assigned function"></button>
-                    <button class="key_op _divide" title="divide">&divide;</button>
+                    <button class="key_op _backkey" title="Backspace <--">&#x232B;</button>
+                    <button class="key_fn _modulo" title="modulo">&percnt;</button>
+                    <button class="key_fn _divide" title="divide">&divide;</button>
                 </div>
                 <div class="row">
                     <button class="key _7" title="seven">7</button>
                     <button class="key _8" title="eight">8</button>
                     <button class="key _9" title="nine">9</button>
-                    <button class="key_op _multiply" title="multiply">x</button>
+                    <button class="key_fn _multiply" title="multiply">x</button>
                 </div>
                 <div class="row">
                     <button class="key _4" title="four">4</button>
                     <button class="key _5" title="five">5</button>
                     <button class="key _6" title="six">6</button>
-                    <button class="key_op _minus" title="subtract">-</button>
+                    <button class="key_fn _minus" title="subtract">-</button>
                 </div>
                 <div class="row">
                     <button class="key _1" title="one">1</button>
                     <button class="key _2" title="two">2</button>
                     <button class="key _3" title="three">3</button>
-                    <button class="key_op _plus" title="add">+</button>
+                    <button class="key_fn _plus" title="add">+</button>
                 </div>
                 <div class="row">
                     <button class="key _plusminus" title="negate">&#x00B1;</button>
@@ -70,27 +70,19 @@
                         the brief for this project suggested building a simple calculator that evaluated a pair of
                         numbers and display a result before continuing to evaluate any further inputs which seemed 
                         in my mind to be both correct and mathematically incorrect because if the whole expression 
-                        were to be evaluated using mathematical precedence the result (from the suggested solution)
+                        were to be evaluated using operator precedence the result (from the suggested solution)
                         would often be mathematically incorrect - not a good scenario for a calculator and the 
                         planet's/universe's only precise and deterministic language (maybe programming languages 
-                        could be in there as well)
+                        could be in there as well with some caveats)
                     </p>
                     <p>
                         this created a disonance in my mind and thus led me to abandon the brief in that respect
                         and evaluate the input expressions using operator precedence in a more correct interpretation 
                         of the math (the calculator will tell you if the answer it produces differs from what 
                         javascript 'eval()' produces) by highlighting the result in red however it is still lacking 
-                        some error checking or disabling of keys if something should be prohibited . In other words 
+                        some error checking or disabling of keys if something should be prohibited. In other words 
                         it relies on an operator inputing sensible and valid expressions (just as well this isn't
-                        ever going to be a product)
-                    </p>
-                    <p>
-                        unfortunately this willful and aberrant behaviour has also got me into trouble on occasions 
-                        because I don't necessarily follow directions, the brief, the desired outcome, which can 
-                        then open me to accusations of willful misbehaviour, not following instructions, not achieving 
-                        the project objectives, taking too long, lazy, or whatever else ...
-                        so I would suggest, just don't it ok! It's a rod for your back, no one will thank you and 
-                        you will be criticised, never mind that the solution might actually be better for that effort
+                        ever going to be a product ;)
                     </p>
                 </div>
             </div>

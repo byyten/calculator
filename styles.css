@@ -7,6 +7,7 @@
             padding: 0;
             margin: 0;
             height:100vh;
+            font-size: 16px;
         }
 
         .aside {
@@ -71,25 +72,35 @@
         }
 
         .key,
+        .key_fn,
         .key_op {
             border: 1px solid grey;
             border-radius: 3px;
             height: 50px;
             width: 50px;
-            font-size: 24px;
+            font-size: 1.5em;
         }
-
-        .key_op {
+        .key_op._equals {
+            background-color: rgb(236, 83, 114);
+        }
+        .key_fn._modulo {
+            font-size: 1.1em;
+        }
+        .key_fn {
             background-color: rgb(143, 168, 214);
+        }
+        .key_op._clear, 
+        .key_op._backkey {
+            background-color: goldenrod;
         }
 
         ._display {
             display: flex;
             flex-direction: column;
             width: 220px;
-            height: 60px;
+            height: 65px;
             margin: 5px;
-            padding: 10px;
+            padding: 5px;
             font-size: 16px;
             background-color: rgb(212, 230, 224);
         }
@@ -97,12 +108,15 @@
         ._display_expression {
             display: flex;
             justify-content: flex-end;
+            margin: 5px 0;
+            padding: 5px;
         }
 
         ._result {
             display: flex;
             justify-content: flex-end;
             font-size: 1.2em;
+            padding: 5px
         }
 
         .calculator {
