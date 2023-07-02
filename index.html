@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./styles.css">
 
     <script>
-        window.onload = uiface
+        window.onload = user_interface
     </script>
 </head>
 <body>
@@ -26,7 +26,7 @@
             <div class="keypad">
                 <div class="row">
                     <button class="key_op _clear" title="ESC | DEL">C</button>
-                    <button class="key_op _backkey" title="Backspace <--">&#x232B;</button>
+                    <button class="key_op _backspace" title="Backspace <--">&#x232B;</button>
                     <button class="key_fn _modulo" title="modulo">&percnt;</button>
                     <button class="key_fn _divide" title="divide">&divide;</button>
                 </div>
@@ -69,20 +69,20 @@
                     <p>
                         the brief for this project suggested building a simple calculator that evaluated a pair of
                         numbers and display a result before continuing to evaluate any further inputs which seemed 
-                        in my mind to be both correct and mathematically incorrect because if the whole expression 
+                        in my mind to be both correct and perhaps incorrect because if the whole expression 
                         were to be evaluated using operator precedence the result (from the suggested solution)
-                        would often be mathematically incorrect - not a good scenario for a calculator and the 
-                        planet's/universe's only precise and deterministic language (maybe programming languages 
+                        would occasionally be mathematically incorrect - not a good scenario for a calculator and 
+                        the planet's/universe's only precise and deterministic language (maybe programming languages 
                         could be in there as well with some caveats)
                     </p>
                     <p>
                         this created a disonance in my mind and thus led me to abandon the brief in that respect
                         and evaluate the input expressions using operator precedence in a more correct interpretation 
                         of the math (the calculator will tell you if the answer it produces differs from what 
-                        javascript 'eval()' produces) by highlighting the result in red however it is still lacking 
-                        some error checking or disabling of keys if something should be prohibited. In other words 
-                        it relies on an operator inputing sensible and valid expressions (just as well this isn't
-                        ever going to be a product ;)
+                        javascript 'eval()' produces) by highlighting the result in red. It also attempts to restrict 
+                        inputs to only valid semantiacally correct mathematical expressions. It has been tested 
+                        throughout but there are perhaps so many ways to subvert the logic, most easily by tampering
+                        in the console 
                     </p>
                 </div>
             </div>
